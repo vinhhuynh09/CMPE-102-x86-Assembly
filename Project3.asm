@@ -2,8 +2,7 @@ comment @
 ***********************************************************************
 * Name: Vinh Huynh
 * Assignment: CMPE 102 Project 3
-* Course: CMPE 102 Section 4. Spring Semester 2023
-* Instructor: Professor Loc Lam
+* Course: CMPE 102. Spring Semester 2023
 * Date: April 23, 2023
 *
 * Description:
@@ -60,141 +59,141 @@ shutDownStr     BYTE " System shutdown.",0
 
 yLowerCase = 79h			; ascii for 'y' is 79h
 nLowerCase = 6Eh			; ascii for 'n' is 6Eh
-asciiForNumber0 = 30h		; ascii for '0' is 30h
-asciiForNumber1 = 31h		; ascii for '1' is 31h
+asciiForNumber0 = 30h			; ascii for '0' is 30h
+asciiForNumber1 = 31h			; ascii for '1' is 31h
 
 .code
 ;******************************************
 main PROC
 ;******************************************
 	mov edx,OFFSET productStr	; display "Medical Laser System"
-	call WriteString			; Irvine library procedure. WriteString takes edx
-	call Crlf					; Irvine lib go to next line
+	call WriteString		; Irvine library procedure. WriteString takes edx
+	call Crlf			; Irvine lib go to next line
 
 start:
 	mov control,00000000b		; reset control variable
 	call Crlf					
 	mov edx,OFFSET startStr		; display "Start? y/n:"
 	call WriteString
-	call ReadChar				; ReadChar returns al
-	call WriteChar				; write al to the screen
+	call ReadChar			; ReadChar returns al
+	call WriteChar			; write al to the screen
 
 	; Check for input for 'y' or 'n'
 	call isValidInput_y_or_n	; isValidInput_y_or_n returns in bl - 1 for valid, 0 for invalid in bl
 	cmp bl,0
-	jz start					; jump to start if bl = 0 (invalid)
-								; another way to check jump to start if al is NOT equal to y or n
+	jz start			; jump to start if bl = 0 (invalid)
+					; another way to check jump to start if al is NOT equal to y or n
 
-	cmp al,yLowerCase			; ascii 79h is lower case 'y'. If y, jz to getStandByBit
+	cmp al,yLowerCase		; ascii 79h is lower case 'y'. If y, jz to getStandByBit
 	jz getStandByBit
 
-	cmp al,nLowerCase			; if al == n, ZR = 1, jz to shutdown
+	cmp al,nLowerCase		; if al == n, ZR = 1, jz to shutdown
 	jz shutDown
 
 getStandByBit:
-	call systemStatus				; display system status. "System Standby" or "System Ready"
+	call systemStatus		; display system status. "System Standby" or "System Ready"
 
 invalidStandbyBit:
-	mov control,00000000b			; reset control here because standby bit may have been set, but ready y/n = n
+	mov control,00000000b		; reset control here because standby bit may have been set, but ready y/n = n
 	mov edx,OFFSET standbyBitStr	; display "Standby bit (1/0):"
 	call WriteString
-	call ReadChar					; I could have used ReadInt
-									; ReadInt reads a 32-bit signed decimal integer from the keyboard, terminated by the Enter key.
-									; However, I choose to use ReadChar to make the user interface consistent with ReadChar when getting 'y' and 'n'									
-	call WriteChar					; write al to the screen
+	call ReadChar			; I could have used ReadInt
+					; ReadInt reads a 32-bit signed decimal integer from the keyboard, terminated by the Enter key.
+					; However, I choose to use ReadChar to make the user interface consistent with ReadChar when getting 'y' and 'n'									
+	call WriteChar			; write al to the screen
 
-	call isValidInput1or0			; isValidInput1or0 returns in bl - 1 for valid, 0 for invalid in bl
+	call isValidInput1or0		; isValidInput1or0 returns in bl - 1 for valid, 0 for invalid in bl
 	cmp bl,0
-	jz invalidStandbyBit			; ask for standby bit again because input was invalid
+	jz invalidStandbyBit		; ask for standby bit again because input was invalid
 
-	sub al,30h						; al is a ascii. Since I used ReadChar() so I have subtract 30h which is zero
-	shl al,7						; shift left starting from LSB to MSB which is the Standby bit
-	or control,al					; store MSB bit (standby) to control byte
+	sub al,30h			; al is a ascii. Since I used ReadChar() so I have subtract 30h which is zero
+	shl al,7			; shift left starting from LSB to MSB which is the Standby bit
+	or control,al			; store MSB bit (standby) to control byte
 
 getReady:
 	call Crlf
-	mov edx,OFFSET readyStr			; "Ready? y/n:"
+	mov edx,OFFSET readyStr		; "Ready? y/n:"
 	call WriteString				
-	call ReadChar					; ReadChar returns al
-	call WriteChar					; write al to the screen
+	call ReadChar			; ReadChar returns al
+	call WriteChar			; write al to the screen
 
-	call isValidInput_y_or_n		; isValidInput_y_or_n returns in bl - 1 for valid, 0 for invalid in bl
+	call isValidInput_y_or_n	; isValidInput_y_or_n returns in bl - 1 for valid, 0 for invalid in bl
 	cmp bl,0
 	jz getReady
 
-checkStandBit:						; standby bit must be set before asking for ready bit.
-									; it does not matter "Ready? y/n" = y or n here. if standby bit is 0 ask for standby bit again
-	test control,10000000b			; check for MSB which is the standby bit
-	jz getStandByBit				; jump if zero zf = 1, in other words standby bit is 0
+checkStandBit:				; standby bit must be set before asking for ready bit.
+					; it does not matter "Ready? y/n" = y or n here. if standby bit is 0 ask for standby bit again
+	test control,10000000b		; check for MSB which is the standby bit
+	jz getStandByBit		; jump if zero zf = 1, in other words standby bit is 0
 
-	cmp al,yLowerCase				; ascii 79h is lower case 'y'. If y, jmp to getReadyBit
+	cmp al,yLowerCase		; ascii 79h is lower case 'y'. If y, jmp to getReadyBit
 	jz getReadyBit
-	cmp al,nLowerCase				; if al == n, ZR = 1, jz to getStandByBit
+	cmp al,nLowerCase		; if al == n, ZR = 1, jz to getStandByBit
 	jz getStandByBit
 
 	
-getReadyBit:						; Now deal with y
+getReadyBit:				; Now deal with y
 	call systemStatus
-	mov edx,OFFSET readyBitStr		; display "Ready bit (1/0): "
+	mov edx,OFFSET readyBitStr	; display "Ready bit (1/0): "
 	call WriteString
 	call ReadChar
-	call WriteChar					; write al to the screen
+	call WriteChar			; write al to the screen
 
-	call isValidInput1or0			; isValidInput1or0 returns 1 for valid, 0 for invalid in bl
+	call isValidInput1or0		; isValidInput1or0 returns 1 for valid, 0 for invalid in bl
 	cmp bl,0
 	je getReadyBit
 
-	sub al,30h						; al is a char. I used ReadChar() so I need to  subtract 30h which is zero
+	sub al,30h			; al is a char. I used ReadChar() so I need to  subtract 30h which is zero
 	or control,al
 
-fire:								; now deal with fire? y/n
+fire:					; now deal with fire? y/n
 	call Crlf
-	mov edx,OFFSET fireStr			; display "Fire? y/n: "
+	mov edx,OFFSET fireStr		; display "Fire? y/n: "
 	call WriteString
-	call ReadChar					; ReadChar returns al
-	call WriteChar					; write al to the screen
+	call ReadChar			; ReadChar returns al
+	call WriteChar			; write al to the screen
 
 	; check for valid input
-	cmp al,nLowerCase				; al =? n, if yes to go start
-	jz start						; if true, jmp to start
-	cmp al,yLowerCase				; al =? y, if true, al == n or al == y
+	cmp al,nLowerCase		; al =? n, if yes to go start
+	jz start			; if true, jmp to start
+	cmp al,yLowerCase		; al =? y, if true, al == n or al == y
 	jz valid						
 
-	call isValidInput_y_or_n		; isValidInput_y_or_n returns 1 for valid, 0 for invalid in bl
+	call isValidInput_y_or_n	; isValidInput_y_or_n returns 1 for valid, 0 for invalid in bl
 	cmp bl,0
 	jz fire
 
 valid:
 	; check for LSB aka ready bit
-	rcr control,1					; Per requirement I must use RCR. Otherwise, I can use OR or TEST to find is LSB was set or not
-	jc checkAllBit					; check for carry flag
+	rcr control,1			; Per requirement I must use RCR. Otherwise, I can use OR or TEST to find is LSB was set or not
+	jc checkAllBit			; check for carry flag
 
-	jnc unableToFire				; jump if cf is 1 ; ready bit is NOT ready
+	jnc unableToFire		; jump if cf is 1 ; ready bit is NOT ready
 
 checkAllBit:
-	rcl control,1					; recover control
-	cmp control,81h					; 81H - standby and ready are sets
-									; actually here, I only have to check for the ready bit
-									; because the requirement requires standby bit is set by the time I get to here
-									; but the requiremnt also stated to check for both bits.
-	jz systemFired					; jump if zr = 1 (a1 == 81h)
+	rcl control,1			; recover control
+	cmp control,81h			; 81H - standby and ready are sets
+					; actually here, I only have to check for the ready bit
+					; because the requirement requires standby bit is set by the time I get to here
+					; but the requiremnt also stated to check for both bits.
+	jz systemFired			; jump if zr = 1 (a1 == 81h)
 
 unableToFire:	
-	rcl control,1					; recover control
+	rcl control,1			; recover control
 	mov edx,OFFSET unableFireStr	; display "Unable to fire."
 	call WriteString
 	call Crlf
 	
-	cmp control,80h					; if readybit is 0 ask for it again.
+	cmp control,80h			; if readybit is 0 ask for it again.
 	je getReadyBit
 
-systemFired:						; label executed if standyBy and ready bit are both 1
-	mov edx,OFFSET sysFireStr		; display "System fired."
+systemFired:				; label executed if standyBy and ready bit are both 1
+	mov edx,OFFSET sysFireStr	; display "System fired."
 	call WriteString
 	jmp fire
 
 shutDown:
-	mov edx,OFFSET shutDownStr		; display "System shutdown."
+	mov edx,OFFSET shutDownStr	; display "System shutdown."
 	call WriteString
 	call Crlf
 
@@ -243,7 +242,7 @@ isValidInput1or0 ENDP
 ;******************************************
 isValidInput_y_or_n PROC uses edx
 	cmp al,yLowerCase	; check for lowercase y
-	jz valid			; jz is same as je
+	jz valid		; jz is same as je
 
 	cmp al,nLowerCase	; check for lowercase n
 	jz valid
@@ -268,7 +267,7 @@ isValidInput_y_or_n ENDP
 systemStatus PROC uses edx
 	cmp control, 00000000b
 	jz standby
-	mov edx,OFFSET sysReadyStr		; display "System Ready."
+	mov edx,OFFSET sysReadyStr	; display "System Ready."
 	jmp exitProc
 
 standby:
