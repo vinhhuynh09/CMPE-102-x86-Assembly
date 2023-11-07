@@ -2,8 +2,7 @@ comment @
 ***********************************************************************
 * Name: Vinh Huynh
 * Assignment: CMPE 102 Project 4
-* Course: CMPE 102 Section 4. Spring Semester 2023
-* Instructor: Professor Loc Lam
+* Course: CMPE 102. Spring Semester 2023
 * Date: May 07, 2023
 *
 * Description:
@@ -65,16 +64,16 @@ ExitProcess PROTO, dwExitCode:DWORD
 macroDisplayText MACRO text:REQ, newLine := < -1 >	
 	LOCAL string
 	.data					; local data
-	string BYTE text,0		; define the string
+	string BYTE text,0			; define the string
 	.code
 	push edx
 	mov  edx,OFFSET string	
 	if newLine EQ -1			; because requirements asked to use IF and ELSE,
-								; I have to call Writestring two times.
+						; I have to call Writestring two times.
 		call Writestring		; print only the string, but no new line
 	else					
 		call Writestring
-		call Crlf				; print new line
+		call Crlf			; print new line
 	endif
 	pop  edx
 ENDM
@@ -87,8 +86,8 @@ num3 DWORD 3h
 num4 DWORD 4h
 num5 DWORD 5h
 numberOfVariables EQU ($ - num1) / TYPE num1	; numberOfVariables = number of declared variable. 
-												; in this program numberOfVariables = 5, num1 -> num5
-												; Also, this meets requirement to use $ and TYPE
+						; in this program numberOfVariables = 5, num1 -> num5
+						; Also, this meets requirement to use $ and TYPE
 
 contentStr		BYTE "Content: ",0
 dashStr			BYTE "----------------------------------------",0
@@ -132,18 +131,18 @@ runLevelOne ENDP
 ;	Returns: nothing
 ;******************************************
 runLevelTwo PROC 
-	pusha						; per requirement
+	pusha					; per requirement
 	push ebp
 	mov ebp,esp
-	add ebp,40					; 32 bytes for pusha, and another 8 (ebp and return address) was pushed. 
-	mov ecx,numberOfVariables	; loop 5 times
+	add ebp,40				; 32 bytes for pusha, and another 8 (ebp and return address) was pushed. 
+	mov ecx,numberOfVariables		; loop 5 times
 L1:
 	mov  edx,OFFSET addStr
 	call Writestring			; print "Address: "
 
 	mov eax,ebp
 	call WriteHex				; print address of num#
-	mov al,'H'					; append char 'H' at the end of the address
+	mov al,'H'				; append char 'H' at the end of the address
 	call WriteChar
 
 	mov  edx,OFFSET arrowContentStr	 
@@ -151,17 +150,17 @@ L1:
 
 	mov eax,[ebp]
 	call WriteHex				; print the actual content
-	mov al,'H'					; append char 'H' at the end of the content
+	mov al,'H'				; append char 'H' at the end of the content
 	call WriteChar
 	add ebp,TYPE DWORD			; go to next address
 	call Crlf
-	Loop L1						; loop to L1
+	Loop L1					; loop to L1
 	
 	mov ebp,esp
 	pop ebp
-	popa						; per requirement
+	popa					; per requirement
 
-	ret 20						; clean up the stack
+	ret 20					; clean up the stack
 
 runLevelTwo ENDP
 
