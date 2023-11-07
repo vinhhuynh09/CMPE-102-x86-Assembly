@@ -2,8 +2,7 @@ comment @
 ***********************************************************************
 * Name: Vinh Huynh
 * Assignment: CMPE 102 Project 1
-* Course: CMPE 102 Section 4. Spring Semester 2023
-* Instructor: Professor Loc Lam
+* Course: CMPE 102. Spring Semester 2023
 * Date: March 03, 2023
 *
 * Description:
@@ -53,17 +52,17 @@ main PROC
 	; Below are some different ways.
 
 	mov esi, OFFSET array		; esi points to the first element of the array[0]
-	mov ax, [esi]				; ax = content in ESI which is 1000h
-	add num1, ax				; num1 = num1 + ax which is 1001h
+	mov ax, [esi]			; ax = content in ESI which is 1000h
+	add num1, ax			; num1 = num1 + ax which is 1001h
 
-	add esi, 2					; since data type of array is SWORD which is 16-bit or 2 bytes.
-								; adding esi by 2 takes us to the next element of the array[1]
-	mov ax, [esi]				; ax = content in ESI which is 2000h
-	add num2, ax				; num2 = num2 + ax which is 2002h
+	add esi, 2			; since data type of array is SWORD which is 16-bit or 2 bytes.
+					; adding esi by 2 takes us to the next element of the array[1]
+	mov ax, [esi]			; ax = content in ESI which is 2000h
+	add num2, ax			; num2 = num2 + ax which is 2002h
 
 	; Here is another way to get array[3]
 	mov ax, WORD PTR [array + TYPE array + 2]	; TYPE array = 2 for 2 bytes. ax = array[3] = 3000h
-	add num3, ax				; num3 = num3 + ax which is 3004h
+	add num3, ax					; num3 = num3 + ax which is 3004h
 
 	; Here is another way to get to array[4]
 	mov ax, [array + 6]			; add 6 bytes starting from first array
@@ -76,13 +75,13 @@ main PROC
 	mov bx, num1
 	add bx, num2				; bx = num1 + num2
 
-	sub ax, bx					; ax = ax - bx. (num3 + num4) - (num1 + num2)
-	inc ax						; ax = (num3 + num4) - (num1 + num2) + 1
-								; or add ax, 1
+	sub ax, bx				; ax = ax - bx. (num3 + num4) - (num1 + num2)
+	inc ax					; ax = (num3 + num4) - (num1 + num2) + 1
+						; or add ax, 1
 
 	; Finally mov ax to total
 	mov total, ax				; total = (num3 + num4) - (num1 + num2) + 1
-								; total = 400ah
+						; total = 400ah
 
   INVOKE ExitProcess, 0
 main ENDP
